@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A message for you</title>
+<style>
+  :root{
+    --bg: #ffffff;
+    --bg-2: #ffffff;
+    --ink: #000000;
+    --ink-soft: #666666;
+    --accent: #000000;
+    --hairline: rgba(0, 0, 0, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 40%, var(--bg-2) 0%, var(--bg) 70%);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  body.is-reading {
+    overflow-y: auto;
+    align-items: flex-start;
+    display: block;
+  }
+
+  .stage {
+    position: relative;
+    width: 90vw;
+    max-width: 700px;
+    height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .line .accent {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .actions {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .actions-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .actions-prompt {
+    font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-align: center;
+  }
+
+  .actions.is-active {
+    pointer-events: auto;
+  }
+
+  .btn {
+    appearance: none;
+    border: none;
+    border-radius: 980px;
+    padding: 13px 28px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .btn-primary:hover {
+    background: #000;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--hairline);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(43, 43, 43, 0.05);
+    color: var(--ink);
+  }
+
+  .letter {
+    display: none;
+    width: 100%;
+    justify-content: center;
+    padding: 12vh 24px 14vh;
+    opacity: 0;
+  }
+
+  .letter.is-active {
+    display: flex;
+  }
+
+  .letter-inner {
+    max-width: 560px;
+    width: 100%;
+  }
+
+  .letter-inner p {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0 0 1.3em;
+  }
+
+  .letter-inner p:first-child {
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+
+  .letter-inner p:last-child {
+    margin-bottom: 0;
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .line, .letter { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grain"></div>
+
+  <div class="stage" id="stage">
+    <div class="line" id="line"></div>
+  </div>
+
+  <div class="actions" id="actions">
+    <div class="actions-prompt">What will you decide?</div>
+    <div class="actions-buttons">
+      <button class="btn btn-secondary" id="btn-ignore">Ignore</button>
+      <button class="btn btn-primary" id="btn-read">Read</button>
+    </div>
+  </div>
+
+  <div class="letter" id="letter">
+    <div class="letter-inner">
+      <p>Hello, Ms. Balboa.</p>
+      <p>You probably don't remember me, but my name is Gerardo. A long time ago — maybe not that long ago — we were good friends, or at least I like to think we were.</p>
+      <p>I was going through some of my old emails recently and came across one from you. Reading it brought back some good memories from those days. I don't know if you still use that email address, or if you'll ever actually read this. Maybe I'm just sending words into the void, but I do hope this message somehow reaches you.</p>
+      <p>The reason I decided to write is because there's something that has been weighing on me for a long time, and, believe it or not, it's something I've wanted to tell you for years.</p>
+      <p>The last time we talked, I said some really hurtful things about you, and I deeply regret it. Looking back now, I feel honestly embarrassed and ashamed of the things I said.</p>
+      <p>You were a really important person in my life, and I feel lucky that I got to know you. I just wouldn't want the last impression you have of me to be those words I said back then.</p>
+      <p>So, I just wanted to say that I'm truly sorry. If I hurt or offended you in any way, I hope you know that I genuinely regret it. I know it's been a long time, and I don't expect anything from you. I just felt like I needed to say it.</p>
+      <p>I hope you can understand, and maybe someday, forgive me.</p>
+      <p>Anyway, I sincerely hope life has been good to you. I hope the things you once wished for have found their way to you, that you're doing well, and that some of those dreams you had back then came true.</p>
+      <p>Take care, wherever life has taken you.</p>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+  const lineEl = document.getElementById("line");
+  const stageEl = document.getElementById("stage");
+  const actionsEl = document.getElementById("actions");
+  const letterEl = document.getElementById("letter");
+  const btnIgnore = document.getElementById("btn-ignore");
+  const btnRead = document.getElementById("btn-read");
+
+  const holdTime = 1.3;   // cuánto tiempo se queda cada texto visible
+  const moveDist = 60;    // cuánto sube al entrar/salir
+
+  const introSequence = [
+    "Hi<span class=\"accent\">.</span>",
+    "Someone sent you a message",
+    "From the <span class=\"accent\">past</span>",
+    "For you"
+  ];
+
+  const confirmSequences = [
+    ["Are you sure<span class=\"accent\">?</span>", "This is very important information"],
+    ["Wait<span class=\"accent\">.</span>", "This can't wait any longer"],
+    ["Don't go<span class=\"accent\">.</span>", "You need to see this"],
+    ["Really<span class=\"accent\">?</span>", "You won't be able to ignore it forever"],
+    ["Still here<span class=\"accent\">.</span>", "It's been waiting for you"]
+  ];
+
+  let lastConfirmIndex = -1;
+  function nextConfirmSequence() {
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * confirmSequences.length);
+    } while (idx === lastConfirmIndex && confirmSequences.length > 1);
+    lastConfirmIndex = idx;
+    return confirmSequences[idx];
+  }
+
+  function playSequence(phrases, onComplete) {
+    actionsEl.classList.remove("is-active");
+    gsap.set(actionsEl, { opacity: 0 });
+    gsap.set(lineEl, { y: moveDist, opacity: 0 });
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        if (onComplete) onComplete();
+      }
+    });
+
+    phrases.forEach((html) => {
+      tl.call(() => { lineEl.innerHTML = html; });
+
+      tl.to(lineEl, {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power3.out"
+      });
+
+      tl.to({}, { duration: holdTime });
+
+      tl.to(lineEl, {
+        y: -moveDist,
+        opacity: 0,
+        duration: 0.7,
+        ease: "power2.in"
+      });
+    });
+
+    tl.add(() => {
+      actionsEl.classList.add("is-active");
+    });
+
+    tl.to(actionsEl, {
+      opacity: 1,
+      duration: 1,
+      ease: "power1.out"
+    }, "-=0.2");
+  }
+
+  function showLetter() {
+    const tl = gsap.timeline();
+
+    tl.to([stageEl, actionsEl], {
+      opacity: 0,
+      duration: 0.5,
+      ease: "power2.in"
+    });
+
+    tl.call(() => {
+      stageEl.style.display = "none";
+      actionsEl.style.display = "none";
+      actionsEl.classList.remove("is-active");
+      letterEl.classList.add("is-active");
+      document.body.classList.add("is-reading");
+      window.scrollTo(0, 0);
+    });
+
+    tl.to(letterEl, {
+      opacity: 1,
+      duration: 0.9,
+      ease: "power1.out"
+    });
+  }
+
+  btnIgnore.addEventListener("click", () => {
+    playSequence(nextConfirmSequence());
+  });
+
+  btnRead.addEventListener("click", () => {
+    showLetter();
+  });
+
+  // arranque
+  gsap.delayedCall(0.3, () => playSequence(introSequence));
+</script>
+
+</body>
+</html>
